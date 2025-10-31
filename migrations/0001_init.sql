@@ -1,0 +1,50 @@
+CREATE TABLE IF NOT EXISTS users (
+                                     id BIGSERIAL PRIMARY KEY,
+                                     email TEXT NOT NULL UNIQUE,
+                                     password_hash TEXT NOT NULL,
+                                     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS authors (
+                                       id BIGSERIAL PRIMARY KEY,
+                                       name TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS genres (
+                                      id BIGSERIAL PRIMARY KEY,
+                                      name TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS books (
+                                     id BIGSERIAL PRIMARY KEY,
+                                     title TEXT NOT NULL,
+                                     language TEXT,
+                                     pub_year INT,
+                                     isbn TEXT UNIQUE,
+                                     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS book_author (
+                                           book_id BIGINT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+                                           author_id BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+                                           PRIMARY KEY (book_id, author_id)
+);
+
+CREATE TABLE IF NOT EXISTS book_genre (
+                                          book_id BIGINT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+                                          genre_id BIGINT NOT NULL REFERENCES genres(id) ON DELETE CASCADE,
+                                          PRIMARY KEY (book_id, genre_id)
+);
+
+CREATE TABLE IF NOT EXISTS reviews (
+                                       id BIGSERIAL PRIMARY KEY,
+                                       book_id BIGINT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+                                       user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                                       rating INT CHECK (rating BETWEEN 1 AND 5),
+                                       text TEXT,
+                                       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_books_title    ON books (title);
+CREATE INDEX IF NOT EXISTS idx_books_pub_year ON books (pub_year);
+CREATE INDEX IF NOT EXISTS idx_reviews_book_id ON reviews (book_id);

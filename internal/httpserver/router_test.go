@@ -1,11 +1,10 @@
-package handlers
+package httpserver
 
 import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/AlexAnd012/BookFinder/internal/httpserver"
 	"github.com/AlexAnd012/BookFinder/internal/logging"
 )
 
@@ -23,7 +22,7 @@ func (fakeBooks) Get(http.ResponseWriter, *http.Request)    {}
 func (fakeBooks) Search(http.ResponseWriter, *http.Request) {}
 
 func TestRouter_Health(t *testing.T) {
-	r := httpserver.NewRouter(tlog{}, fakeBooks{})
+	r := NewRouter(tlog{}, fakeBooks{})
 	req := httptest.NewRequest(http.MethodGet, "/health", nil)
 	w := httptest.NewRecorder()
 

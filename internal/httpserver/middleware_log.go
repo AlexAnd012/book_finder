@@ -1,9 +1,10 @@
-package logging
+package httpserver
 
 import (
 	"net/http"
 	"time"
 
+	"github.com/AlexAnd012/BookFinder/internal/logging"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
