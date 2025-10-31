@@ -35,7 +35,7 @@
 
 CRUD
 
-Книги, Авторы, Жанры — CRUD для админов
+Книги, Авторы, Жанры 
 
 Отзывы — create/list для авторизованных пользователей
 
@@ -52,17 +52,6 @@ CRUD
 JWT (HS256), обновление через refresh-токен
 
 ## 3) REST API 
-### Аутентификация
-
-POST /v1/auth/register
-body: {email, password} → 201 {id, email, role, created_at}
-
-POST /v1/auth/login
-body: {email, password} → 200 {access_token, refresh_token}
-
-POST /v1/auth/refresh
-body: {refresh_token} → 200 {access_token}
-
 ### Книги
 
 POST /v1/books (admin)
@@ -115,20 +104,22 @@ resp: {job_id}
 
 GET /v1/import/{job_id} → {status: queued|running|done|failed, stats:{inserted, updated, skipped, errors}}
 
-### Служебные
-
-GET /healthz, GET /readyz, GET /metrics
 
 ## 4) Структура репозитория
 book-finder/
 ├─ cmd/main.go  
 ├─ internal/config/config.go  
-├─ internal/httpserver/router.go  
-├─ internal/httpserver/middleware.go  
+├─ internal/httpserver/router.go 
+├─ internal/httpserver/router_test.go  
+├─ internal/httpserver/middleware_log.go  
 ├─ internal/handlers/books.go  
 ├─ internal/handlers/health.go  
+├─ internal/handlers/books_test.go  
+├─ internal/handlers/health_test.go  
 ├─ internal/repo/postgres.go  
 ├─ internal/repo/book_repo.go  
+├─ internal/logging/logger.go 
+├─ internal/data/data.go 
 ├─ migrations/  
 │ ├─ 0001_init.sql  
 │ └─ 0002_sample_data.sql  
@@ -137,16 +128,13 @@ book-finder/
 │ ├─ seed.sh  
 │ └─ smoke.sh  
 ├─ docker-compose.yml  
-├─ .env.example  
-├─ Makefile  
+├─ .env
 └─ go.mod  
 
 ## 5) Скрипты Bash 
 
-scripts/migrate.sh — применить миграции (up/down)
+scripts/migrate.sh — применить миграции 
 
-scripts/seed.sh — базовые данные (жанры, пары авторов)
+scripts/seed.sh — базовые данные 
 
-scripts/smoke.sh — curl healthz, create user, login, пара CRUD запросов
-
-scripts/bench.sh — hey/wrk против /v1/books?q=...
+scripts/smoke.sh — curl healthz, create user
