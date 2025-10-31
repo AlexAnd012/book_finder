@@ -51,7 +51,7 @@ CRUD
 
 JWT (HS256), обновление через refresh-токен
 
-## 3) REST API 
+## 4) REST API 
 ### Книги
 
 POST /v1/books (admin)
@@ -105,7 +105,7 @@ resp: {job_id}
 GET /v1/import/{job_id} → {status: queued|running|done|failed, stats:{inserted, updated, skipped, errors}}
 
 
-## 4) Структура репозитория
+## 5) Структура репозитория
 book-finder/
 ├─ cmd/main.go  
 ├─ internal/config/config.go  
@@ -131,7 +131,7 @@ book-finder/
 ├─ .env
 └─ go.mod  
 
-## 5) Скрипты Bash 
+## 6) Скрипты Bash 
 
 scripts/migrate.sh — применить миграции 
 
