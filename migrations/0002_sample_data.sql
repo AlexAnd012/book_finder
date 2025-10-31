@@ -11,7 +11,7 @@ ON CONFLICT (isbn) DO NOTHING;
 INSERT INTO book_author(book_id, author_id)
 SELECT b.id, a.id
 FROM books b, authors a
-WHERE b.title='The Hobbit' AND a.name='J. R. R. Tolkien'
+WHERE b.title='The Hobbit' AND a.name='J. R. Tolkien'
 ON CONFLICT DO NOTHING;
 
 INSERT INTO book_genre(book_id, genre_id)

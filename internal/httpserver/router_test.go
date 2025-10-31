@@ -8,6 +8,7 @@ import (
 	"github.com/AlexAnd012/BookFinder/internal/logging"
 )
 
+// Пустой логгер для запуска
 type tlog struct{}
 
 func (tlog) With(...any) logging.Logger { return tlog{} }

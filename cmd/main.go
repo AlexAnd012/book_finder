@@ -18,16 +18,13 @@ import (
 )
 
 func main() {
-	// 1) Конфиг
 	cfg := config.Load()
 
-	// 2) Логгер (JSON). Поставь LevelDebug в dev, если нужно подробнее.
 	log := logging.New(slog.LevelInfo).With("service", "book-finder", "env", "dev")
 
-	// 3) DSN: берем DB_DSN, иначе склеиваем из HOST/USER/PASS + cfg.Dbname
 	dsn := os.Getenv("DB_DSN")
 	if dsn == "" {
-		host := envOr("DB_HOST", "localhost") // если API в Docker – обычно "db"
+		host := envOr("DB_HOST", "localhost")
 		user := envOr("DB_USER", "postgres")
 		pass := envOr("DB_PASSWORD", "12345")
 		dsn = "postgres://" + user + ":" + pass + "@" + host + ":5432/" + cfg.Dbname + "?sslmode=disable"
@@ -41,11 +38,10 @@ func main() {
 	}
 	defer pg.Close()
 
-	// 5) Хендлеры домена
+	// 5) Хендлеры
 	bookRepo := repo.NewBookRepo(pg)
 	books := handlers.NewBookHTTP(bookRepo, log)
 
-	// 6) Роутер принимает только готовые хендлеры
 	r := httpserver.NewRouter(log, books)
 
 	// 7) HTTP-сервер
@@ -57,7 +53,7 @@ func main() {
 		IdleTimeout:  60 * time.Second,
 	}
 
-	// 8) Старт + graceful shutdown
+	// 8) Старт
 	errCh := make(chan error, 1)
 	go func() {
 		log.Info("http_server_start", "port", cfg.Port)

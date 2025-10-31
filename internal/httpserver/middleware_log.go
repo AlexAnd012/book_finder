@@ -14,20 +14,19 @@ type statusWriter struct {
 	bytes  int
 }
 
-func (w *statusWriter) WriteHeader(code int) { w.status = code; w.ResponseWriter.WriteHeader(code) }
-func (w *statusWriter) Write(b []byte) (int, error) {
-	if w.status == 0 {
-		w.status = http.StatusOK
-	}
-	n, err := w.ResponseWriter.Write(b)
-	w.bytes += n
-	return n, err
+// WriteHeader .чтобы знать какой статус отправили
+func (w *statusWriter) WriteHeader(code int) {
+	w.status = code
+	w.ResponseWriter.WriteHeader(code)
 }
 
 func AccessLog(log logging.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// Сохраняем старт времени
 			start := time.Now()
+
+			//Создаём наш statusWriter и передаём его дальше
 			sw := &statusWriter{ResponseWriter: w}
 			next.ServeHTTP(sw, r)
 			log.Info("http_access",

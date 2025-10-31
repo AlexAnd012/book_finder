@@ -8,6 +8,7 @@ import (
 
 type Postgres struct{ Pool *pgxpool.Pool }
 
+// NewPostgres Создаём пул по DSN
 func NewPostgres(dsn string) (*Postgres, error) {
 	pool, err := pgxpool.New(context.Background(), dsn)
 	if err != nil {

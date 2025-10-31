@@ -16,6 +16,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+// Мок репозитория для проверки
 type fakeBookRepo struct {
 	CreateFn func(context.Context, data.Book) (int64, error)
 	GetFn    func(context.Context, int64) (data.BookWithMeta, error)
@@ -41,7 +42,7 @@ func (f *fakeBookRepo) Search(ctx context.Context, q *string, g *string, yf, yt 
 	return f.SearchFn(ctx, q, g, yf, yt, limit, offset)
 }
 
-// простейший JSON-логгер
+// Пустой логгер
 type testLogger struct{}
 
 func (testLogger) With(...any) logging.Logger { return testLogger{} }
@@ -49,6 +50,7 @@ func (testLogger) Debug(string, ...any)       {}
 func (testLogger) Info(string, ...any)        {}
 func (testLogger) Error(string, ...any)       {}
 
+// Создание книги, позитивный кейс
 func TestBooks_Create_201(t *testing.T) {
 	repo := &fakeBookRepo{
 		CreateFn: func(_ context.Context, b data.Book) (int64, error) {
@@ -76,6 +78,7 @@ func TestBooks_Create_201(t *testing.T) {
 	}
 }
 
+// Ошибка должна произойти до обращения к БД на этапе парсинга JSON
 func TestBooks_Create_400_BadJSON(t *testing.T) {
 	h := handlers.NewBookHTTP(&fakeBookRepo{}, testLogger{})
 	req := httptest.NewRequest(http.MethodPost, "/api/books", bytes.NewBufferString("{bad}"))
@@ -100,9 +103,11 @@ func TestBooks_Get_200(t *testing.T) {
 	}
 	h := handlers.NewBookHTTP(repo, testLogger{})
 
+	//Поднимаем chi, чтобы параметр {id} попал в контекст запроса
 	r := chi.NewRouter()
 	r.Get("/api/books/{id}", h.Get)
 
+	// пускаем запрос через роутер
 	req := httptest.NewRequest(http.MethodGet, "/api/books/7", nil)
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
@@ -112,6 +117,7 @@ func TestBooks_Get_200(t *testing.T) {
 	}
 }
 
+// Имитируем "нет строки в БД"
 func TestBooks_Get_404(t *testing.T) {
 	repo := &fakeBookRepo{
 		GetFn: func(_ context.Context, _ int64) (data.BookWithMeta, error) {
@@ -132,6 +138,7 @@ func TestBooks_Get_404(t *testing.T) {
 	}
 }
 
+// Получение по id когда некорректный id
 func TestBooks_Get_400_InvalidID(t *testing.T) {
 	h := handlers.NewBookHTTP(&fakeBookRepo{}, testLogger{})
 
@@ -147,6 +154,7 @@ func TestBooks_Get_400_InvalidID(t *testing.T) {
 	}
 }
 
+// Проверяем, что хендлер корректно передал текст поиска q должно быть "PS" и Возвращаем одну книгу
 func TestBooks_Search_200(t *testing.T) {
 	repo := &fakeBookRepo{
 		SearchFn: func(_ context.Context, q *string, _ *string, _ *int, _ *int, limit, offset int32) ([]data.BookWithMeta, error) {
@@ -161,7 +169,6 @@ func TestBooks_Search_200(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/api/books?q=PS&limit=5&offset=0", nil)
 	w := httptest.NewRecorder()
 
-	// Можно вызывать напрямую:
 	h.Search(w, req)
 
 	if w.Code != http.StatusOK {

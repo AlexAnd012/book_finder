@@ -9,6 +9,7 @@ import (
 	"github.com/AlexAnd012/BookFinder/internal/logging"
 )
 
+// Пустой логгер для запуска
 type nopLogger struct{}
 
 func (nopLogger) With(...any) logging.Logger {
@@ -19,7 +20,7 @@ func (nopLogger) Info(string, ...any)  {}
 func (nopLogger) Error(string, ...any) {}
 
 func TestHealth_OK(t *testing.T) {
-	h := handlers.Health(nopLogger{}) // если у тебя фабрика; если объект — создай NewHealthHTTP(nopLogger{}).Handle
+	h := handlers.Health(nopLogger{})
 	req := httptest.NewRequest(http.MethodGet, "/health", nil)
 	w := httptest.NewRecorder()
 

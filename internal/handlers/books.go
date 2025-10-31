@@ -13,6 +13,7 @@ import (
 	"strconv"
 )
 
+// BookStore Для тестов
 type BookStore interface {
 	Create(ctx context.Context, b data.Book) (int64, error)
 	Get(ctx context.Context, id int64) (data.BookWithMeta, error)
@@ -20,15 +21,16 @@ type BookStore interface {
 }
 
 type BookHTTP struct {
-	repo BookStore // ← было: *repo.BookRepo
+	repo BookStore
 	log  logging.Logger
 }
 
-func NewBookHTTP(r BookStore, l logging.Logger) *BookHTTP { // ← было: *repo.BookRepo
+func NewBookHTTP(r BookStore, l logging.Logger) *BookHTTP {
 	return &BookHTTP{repo: r, log: l}
 }
 
 func (h *BookHTTP) Create(w http.ResponseWriter, r *http.Request) {
+	//возвращаем новый логгер, у которого каждому сообщению автоматически будут добавляться указанные поля
 	reqLog := h.log.With("req_id", middleware.GetReqID(r.Context()), "route", "POST /v1/books")
 
 	var book data.Book
@@ -54,9 +56,10 @@ func (h *BookHTTP) Create(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(map[string]any{"id": id})
 }
 
-// GET /v1/books/{id}
+// Get GET/v1/books/{id}
 func (h *BookHTTP) Get(w http.ResponseWriter, r *http.Request) {
-	reqLog := h.log.With("req_id", middleware.GetReqID(r.Context()), "route", "GET /v1/books/{id}")
+	//возвращаем новый логгер, у которого каждому сообщению автоматически будут добавляться указанные поля
+	reqLog := h.log.With("req_id", middleware.GetReqID(r.Context()), "route", "GET/v1/books/{id}")
 
 	raw := chi.URLParam(r, "id")
 	id, err := strconv.ParseInt(raw, 10, 64)
@@ -80,8 +83,9 @@ func (h *BookHTTP) Get(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(out)
 }
 
-// GET /v1/books?q=...&limit=&offset=
+// Search GET/v1/books?q=...&limit=&offset=
 func (h *BookHTTP) Search(w http.ResponseWriter, r *http.Request) {
+	//возвращаем новый логгер, у которого каждому сообщению автоматически будут добавляться указанные поля
 	reqLog := h.log.With("req_id", middleware.GetReqID(r.Context()), "route", "GET /v1/books")
 
 	q := r.URL.Query().Get("q")

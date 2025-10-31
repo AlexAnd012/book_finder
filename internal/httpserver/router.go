@@ -10,6 +10,7 @@ import (
 	"github.com/AlexAnd012/BookFinder/internal/logging"
 )
 
+// BookHandlers Для тестов
 type BookHandlers interface {
 	Create(http.ResponseWriter, *http.Request)
 	Get(http.ResponseWriter, *http.Request)
